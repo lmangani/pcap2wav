@@ -2,6 +2,7 @@ import * as path from 'path';
 const debug = require('debug')('pcap2wav:core:pcap-to-wav');
 
 import { sox } from '../sox';
+import { ffmpeg } from '../ffmpeg';
 import { tshark } from '../tshark';
 import { helpers } from '../helpers';
 
