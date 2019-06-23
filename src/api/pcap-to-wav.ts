@@ -1,9 +1,25 @@
 import * as path from 'path';
 const debug = require('debug')('pcap2wav:core:pcap-to-wav');
 
-import { sox } from '../sox';
-import { ffmpeg } from '../ffmpeg';
-import { tshark } from '../tshark';
+var getSox = require('hasbin').sync('sox');
+var getFfmpeg = require('hasbin').sync('ffmpeg');
+var getTshark = require('hasbin').sync('tshark');
+
+if (getSox) {
+	import { sox } from '../sox';
+else if (getFfmpeg) {
+	import { ffmpeg } from '../ffmpeg';
+} else {
+	console.error('No sox or ffmpeg found. Exiting");
+	process.exit(1);
+}
+
+if (getTshark) {
+	import { tshark } from '../tshark';
+} else {
+	console.error('No tshark found. Exiting");
+	process.exit(1);
+}
 import { helpers } from '../helpers';
 
 import { Pcap2WavOptions, RtpData, RtpInfoData } from '../typings';
@@ -126,7 +142,8 @@ class PcapToWav {
         await Promise.all(this.rtps.map(async (rtp) => {
             debug('create wav rtp.ssrc', rtp.ssrc);
             await helpers.fs.writeFileAsync(rtp.codecFile, rtp.hexPayloads, { encoding: 'ascii' });
-            await sox.convertToWav(rtp.codec, rtp.codecFile, rtp.wavFile);
+            if (sox) await sox.convertToWav(rtp.codec, rtp.codecFile, rtp.wavFile);
+            else if (ffmpeg) await ffmpeg.convertToWav(rtp.codec, rtp.codecFile, rtp.wavFile);
         }));
     }
 
@@ -134,7 +151,8 @@ class PcapToWav {
         if (this.rtps.length > 1) {
             debug(`merging ${this.rtps.length} wavs into one`);
             const wavPaths = this.rtps.map((rtp) => rtp.wavFile).join(' ');
-            await sox.mergeWavs(wavPaths, this.wav);
+            if (sox) await sox.mergeWavs(wavPaths, this.wav);
+            else if (ffmpeg) await ffmpeg.mergeWavs(wavPaths, this.wav);
             return;
         }
         if (this.rtps.length === 1) {

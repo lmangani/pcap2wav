@@ -1,6 +1,6 @@
 {
   "name": "pcap2wav",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Extract wav from pcap (rtp)",
   "main": "index.js",
   "types": "out/typings.d.ts",
@@ -34,7 +34,8 @@
   },
   "homepage": "https://github.com/Bobrovskih/pcap2wav#readme",
   "dependencies": {
-    "debug": "^3.1.0"
+    "debug": "^3.1.0",
+    "hasbin": "^1.2.3"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
