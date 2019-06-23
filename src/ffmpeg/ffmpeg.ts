@@ -9,7 +9,8 @@ class Ffmpeg {
     }
 
     public async mergeWavs(inputWavPaths: string, wav: string) {
-        const command = `ffmpeg -i ${inputWavPaths} -filter_complex amix=inputs=2:duration=longest ${wav}`;
+        const wavPaths = inputWavPaths.split(' ').join(' -i ');
+        const command = `ffmpeg -i ${wavPaths} -filter_complex amix=inputs=2:duration=longest ${wav}`;
         const { stderr, stdout } = await helpers.cp.execAsync(command);
         debug(stderr, stdout);
     }
@@ -19,10 +20,10 @@ class Ffmpeg {
         if (codec === 'PCMA') {
             return this.escapingBackslash(`ffmpeg -nostats -loglevel 0 -acodec pcm_alaw -f alaw -ar 8000 -i ${codecFile} -ar 8000  ${wavFile}`);
         }
-        if (codec === 'PCMU') {
+        else if (codec === 'PCMU') {
             return this.escapingBackslash(`ffmpeg -nostats -loglevel 0 -acodec pcm_mulaw -f mulaw -ar 8000 -i ${codecFile} -ar 8000  ${wavFile}`);
         }
-        if (codec === 'G729') {
+        else if (codec === 'G729') {
             return this.escapingBackslash(`ffmpeg -nostats -loglevel 0 -acodec g729 -f g729 -i ${codecFile} -ar 8000  ${wavFile}`);
         }
         throw Error(`cannot define convert command for codec: ${codec}`);
